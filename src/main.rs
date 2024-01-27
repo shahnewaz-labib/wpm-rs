@@ -44,6 +44,8 @@ fn main() {
                 message = "a lazy brown fox jumps over the fence";
                 quit = false;
                 continue;
+            } else if ch == 3 {
+                quit = true;
             }
         }
 
