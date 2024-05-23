@@ -21,6 +21,8 @@ fn main() {
     keypad(stdscr(), true);
     noecho();
 
+    curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
+
     scrollok(stdscr(), true);
 
     start_color();
