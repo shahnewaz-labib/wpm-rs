@@ -14,10 +14,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up rust
-        uses: actions/setup-rust@v1
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
         with:
-          rust-version: stable
+          toolchain: stable
 
       - name: Build the project
         run: cargo build --release
