@@ -2,6 +2,7 @@ extern crate ncurses;
 
 use ncurses::*;
 use rand::prelude::*;
+use std::time::SystemTime;
 
 // vector with 5 random long quotes
 fn get_quote() -> Vec<&'static str> {
@@ -37,6 +38,9 @@ fn main() {
     // get random quote and assign it to message
     let mut message = quotes[rng.gen_range(0..quotes.len())];
 
+    let mut start = SystemTime::now();
+    let mut started = false;
+
     while !quit {
         attron(COLOR_PAIR(1));
         addstr(&message[..pos]);
@@ -51,8 +55,23 @@ fn main() {
             quit = true;
         }
 
+        if !started {
+            start = SystemTime::now();
+            started = true;
+        }
+
         if pos == message.len() - 1 {
             clear();
+            addstr("You finished in ");
+            let elapsed = start.elapsed().unwrap().as_secs_f32();
+            addstr(&format!("{} s\n", elapsed));
+
+            let message_len = message.len() as f32;
+
+            // fix the calculation
+            addstr(&format!("WPM: {}\n", message_len / elapsed * 60.0));
+            started = false;
+
             addstr("Press SPACE to play again or CTRL-C to quit");
             pos = 0;
 
