@@ -7,11 +7,8 @@ use std::time::SystemTime;
 // vector with 5 random long quotes
 fn get_quote() -> Vec<&'static str> {
     vec![
-        "The only way to do great work is to love what you do. If you haven't found it yet, keep looking. Don't settle. As with all matters of the heart, you'll know when you find it.",
-        "Your work is going to fill a large part of your life, and the only way to be truly satisfied is to do what you believe is great work. And the only way to do great work is to love what you do. If you haven't found it yet, keep looking. Don't settle. As with all matters of the heart, you'll know when you find it.",
-        "Your time is limited, don't waste it living someone else's life. Don't be trapped by dogma, which is living the result of other people's thinking. Don't let the noise of other's opinion drowned your own inner voice. And most important, have the courage to follow your heart and intuition, they somehow already know what you truly want to become. Everything else is secondary.",
-        "Don't be trapped by dogma - which is living with the results of other people's thinking. Don't let the noise of others' opinions drown out your own inner voice. And most important, have the courage to follow your heart and intuition.",
-        "Stay hungry, stay foolish."
+        "a quick brown fox jumps over the lazy dog",
+        "stay hungry, stay foolish."
     ]
 }
 
@@ -62,17 +59,16 @@ fn main() {
 
         if pos == message.len() - 1 {
             clear();
-            addstr("You finished in ");
+
+            let words: Vec<&str> = message.split(' ').collect();
+            let message_len: f32 = words.len() as f32;
+
             let elapsed = start.elapsed().unwrap().as_secs_f32();
-            addstr(&format!("{} s\n", elapsed));
-
-            let message_len = message.len() as f32;
-
-            // fix the calculation
-            addstr(&format!("WPM: {}\n", message_len / elapsed * 60.0));
+            addstr(&format!("You finished : {} s\n", elapsed));
+            addstr(&format!("Total words  : {}\n", message_len));
+            addstr(&format!("WPM          : {}\n", message_len / elapsed * 60.0));
             started = false;
-
-            addstr("Press SPACE to play again or CTRL-C to quit");
+            addstr("\nPress SPACE to play again or CTRL-C to quit");
             pos = 0;
 
             ch = getch();
