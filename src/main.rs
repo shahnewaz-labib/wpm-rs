@@ -64,7 +64,7 @@ fn main() {
             let message_len: f32 = words.len() as f32;
 
             let elapsed = start.elapsed().unwrap().as_secs_f32();
-            addstr(&format!("You finished : {} s\n", elapsed));
+            addstr(&format!("Time elapsed : {} s\n", elapsed));
             addstr(&format!("Total words  : {}\n", message_len));
             addstr(&format!("WPM          : {}\n", message_len / elapsed * 60.0));
             started = false;
