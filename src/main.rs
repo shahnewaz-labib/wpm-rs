@@ -1,4 +1,5 @@
 mod app;
+mod ascii_font;
 mod event;
 mod stats;
 mod ui;
