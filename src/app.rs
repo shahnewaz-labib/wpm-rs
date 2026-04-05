@@ -6,11 +6,19 @@ use std::time::Instant;
 const WORD_FILE: &str = "quotes/english.json";
 const DEFAULT_WORD_COUNT: usize = 10;
 
+pub const WORD_COUNT_OPTIONS: [usize; 4] = [10, 25, 50, 100];
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GameState {
     NotStarted,
     Running,
     Finished,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ViewState {
+    Typing,
+    Settings,
 }
 
 #[derive(Debug, Clone)]
@@ -41,6 +49,8 @@ pub struct App {
     pub should_quit: bool,
     pub total_keystrokes: usize,
     pub correct_keystrokes: usize,
+    pub view_state: ViewState,
+    pub settings_cursor: usize,
 }
 
 impl App {
@@ -56,6 +66,12 @@ impl App {
             })
             .collect();
 
+        // Find initial cursor position for settings (matching current word_count)
+        let settings_cursor = WORD_COUNT_OPTIONS
+            .iter()
+            .position(|&w| w == word_count)
+            .unwrap_or(0);
+
         Ok(Self {
             target_text,
             typed_chars,
@@ -68,6 +84,8 @@ impl App {
             should_quit: false,
             total_keystrokes: 0,
             correct_keystrokes: 0,
+            view_state: ViewState::Typing,
+            settings_cursor,
         })
     }
 
@@ -87,6 +105,38 @@ impl App {
         self.end_time = None;
         self.total_keystrokes = 0;
         self.correct_keystrokes = 0;
+    }
+
+    pub fn toggle_settings(&mut self) {
+        match self.view_state {
+            ViewState::Typing => {
+                if self.state != GameState::Running {
+                    self.view_state = ViewState::Settings;
+                    // Sync cursor to current word_count
+                    self.settings_cursor = WORD_COUNT_OPTIONS
+                        .iter()
+                        .position(|&w| w == self.word_count)
+                        .unwrap_or(0);
+                }
+            }
+            ViewState::Settings => {
+                self.view_state = ViewState::Typing;
+            }
+        }
+    }
+
+    pub fn settings_up(&mut self) {
+        self.settings_cursor = self.settings_cursor.saturating_sub(1);
+    }
+
+    pub fn settings_down(&mut self) {
+        self.settings_cursor = (self.settings_cursor + 1).min(WORD_COUNT_OPTIONS.len() - 1);
+    }
+
+    pub fn apply_settings(&mut self) {
+        self.word_count = WORD_COUNT_OPTIONS[self.settings_cursor];
+        self.view_state = ViewState::Typing;
+        self.reset();
     }
 
     pub fn type_char(&mut self, c: char) {

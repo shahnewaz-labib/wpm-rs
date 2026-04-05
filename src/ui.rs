@@ -1,4 +1,4 @@
-use crate::app::{App, GameState};
+use crate::app::{App, GameState, ViewState, WORD_COUNT_OPTIONS};
 use crate::ascii_font;
 use ratatui::{
     layout::{Alignment, Constraint, Layout, Rect},
@@ -9,6 +9,13 @@ use ratatui::{
 };
 
 pub fn draw(frame: &mut Frame, app: &App) {
+    match app.view_state {
+        ViewState::Typing => draw_typing_screen(frame, app),
+        ViewState::Settings => draw_settings_screen(frame, app),
+    }
+}
+
+fn draw_typing_screen(frame: &mut Frame, app: &App) {
     let area = frame.area();
 
     // Main layout: title, content, stats
@@ -22,6 +29,87 @@ pub fn draw(frame: &mut Frame, app: &App) {
     draw_title(frame, chunks[0]);
     draw_text_area(frame, chunks[1], app);
     draw_stats(frame, chunks[2], app);
+}
+
+fn draw_settings_screen(frame: &mut Frame, app: &App) {
+    let area = frame.area();
+
+    let chunks = Layout::vertical([
+        Constraint::Length(3), // Title
+        Constraint::Min(5),    // Settings content
+        Constraint::Length(3), // Help
+    ])
+    .split(area);
+
+    // Title
+    let title = Paragraph::new("Settings")
+        .style(Style::default().fg(Color::Cyan).bold())
+        .centered()
+        .block(Block::default().borders(Borders::ALL));
+    frame.render_widget(title, chunks[0]);
+
+    // Settings content
+    let block = Block::default()
+        .borders(Borders::ALL)
+        .title(" Word Count ");
+    let inner = block.inner(chunks[1]);
+    frame.render_widget(block, chunks[1]);
+
+    // Calculate vertical centering for options
+    let options_height = WORD_COUNT_OPTIONS.len() as u16 + 2; // options + label + spacer
+    let vertical_offset = inner.height.saturating_sub(options_height) / 2;
+
+    let content_area = Rect {
+        x: inner.x,
+        y: inner.y + vertical_offset,
+        width: inner.width,
+        height: inner.height.saturating_sub(vertical_offset),
+    };
+
+    let mut constraints = vec![Constraint::Length(2)]; // "Select word count:" label
+    for _ in WORD_COUNT_OPTIONS {
+        constraints.push(Constraint::Length(1));
+    }
+    let option_chunks = Layout::vertical(constraints).split(content_area);
+
+    // Label
+    let label = Paragraph::new("Select word count:")
+        .style(Style::default().fg(Color::White))
+        .alignment(Alignment::Center);
+    frame.render_widget(label, option_chunks[0]);
+
+    // Options
+    for (i, &count) in WORD_COUNT_OPTIONS.iter().enumerate() {
+        let is_selected = i == app.settings_cursor;
+        let is_current = count == app.word_count;
+
+        let (prefix, suffix) = if is_selected {
+            ("> ", " <")
+        } else {
+            ("  ", "  ")
+        };
+
+        let current_marker = if is_current { " (current)" } else { "" };
+
+        let style = if is_selected {
+            Style::default().fg(Color::Yellow).bold()
+        } else if is_current {
+            Style::default().fg(Color::Green)
+        } else {
+            Style::default().fg(Color::DarkGray)
+        };
+
+        let line = Paragraph::new(format!("{}{}{}{}", prefix, count, suffix, current_marker))
+            .style(style)
+            .alignment(Alignment::Center);
+        frame.render_widget(line, option_chunks[i + 1]);
+    }
+
+    // Help
+    let help = Paragraph::new(" [Up/Down] Navigate | [Enter] Select | [Tab/Esc] Back")
+        .style(Style::default().fg(Color::DarkGray))
+        .block(Block::default().borders(Borders::TOP));
+    frame.render_widget(help, chunks[2]);
 }
 
 fn draw_title(frame: &mut Frame, area: Rect) {
@@ -65,7 +153,7 @@ fn draw_text_area(frame: &mut Frame, area: Rect, app: &App) {
         .block(
             Block::default()
                 .borders(Borders::ALL)
-                .title(" Type the text below "),
+                .title(format!(" Type the text below ({} words) ", app.word_count)),
         )
         .wrap(ratatui::widgets::Wrap { trim: false });
 
@@ -169,7 +257,7 @@ fn draw_finished_screen(frame: &mut Frame, area: Rect, app: &App) {
                 format!("{:.1}%", app.accuracy()),
                 Style::default().fg(Color::Yellow),
             ),
-            Span::raw("  │  Time: "),
+            Span::raw("  |  Time: "),
             Span::styled(
                 format!("{:.1}s", app.elapsed_secs()),
                 Style::default().fg(Color::Cyan),
@@ -196,7 +284,7 @@ fn draw_finished_screen(frame: &mut Frame, area: Rect, app: &App) {
                     format!("{:.1}%", app.accuracy()),
                     Style::default().fg(Color::Yellow),
                 ),
-                Span::raw(" │ Time: "),
+                Span::raw(" | Time: "),
                 Span::styled(
                     format!("{:.1}s", app.elapsed_secs()),
                     Style::default().fg(Color::Cyan),
@@ -224,9 +312,9 @@ fn draw_stats(frame: &mut Frame, area: Rect, app: &App) {
     let stats_line = Line::from(vec![
         Span::raw(" Time: "),
         Span::styled(&time, Style::default().fg(Color::Cyan)),
-        Span::raw(" │ WPM: "),
+        Span::raw(" | WPM: "),
         Span::styled(&wpm, Style::default().fg(Color::Green).bold()),
-        Span::raw(" │ Accuracy: "),
+        Span::raw(" | Accuracy: "),
         Span::styled(&accuracy, Style::default().fg(Color::Yellow)),
     ]);
 
@@ -235,9 +323,9 @@ fn draw_stats(frame: &mut Frame, area: Rect, app: &App) {
 
     // Help line based on state
     let help_text = match app.state {
-        GameState::NotStarted => " Start typing to begin...",
-        GameState::Running => " [Backspace] Delete │ [Esc] Quit",
-        GameState::Finished => " [Space] Play Again │ [Esc] Quit",
+        GameState::NotStarted => " [Tab] Settings | Start typing to begin...",
+        GameState::Running => " [Backspace] Delete | [Esc] Quit",
+        GameState::Finished => " [Space] Play Again | [Tab] Settings | [Esc] Quit",
     };
 
     let help = Paragraph::new(help_text).style(Style::default().fg(Color::DarkGray));
