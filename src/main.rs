@@ -1,25 +1,32 @@
 mod app;
 mod ascii_font;
+mod cli;
+mod config;
 mod event;
+mod history;
 mod stats;
+mod theme;
 mod ui;
 mod words;
 
 use app::App;
+use clap::Parser;
+use cli::Cli;
 use color_eyre::Result;
 
 fn main() -> Result<()> {
     color_eyre::install()?;
+    let cli = Cli::parse();
 
     let terminal = ratatui::init();
-    let result = run(terminal);
+    let result = run(terminal, &cli);
     ratatui::restore();
 
     result
 }
 
-fn run(mut terminal: ratatui::DefaultTerminal) -> Result<()> {
-    let mut app = App::new()?;
+fn run(mut terminal: ratatui::DefaultTerminal, cli: &Cli) -> Result<()> {
+    let mut app = App::new(cli)?;
 
     while !app.should_quit {
         terminal.draw(|frame| ui::draw(frame, &app))?;

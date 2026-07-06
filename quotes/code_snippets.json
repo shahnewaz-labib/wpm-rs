@@ -1,0 +1,24 @@
+{
+  "snippets": [
+    "fn main() {\n    let x = 42;\n    println!(\"{}\", x);\n}",
+    "fn add(a: i32, b: i32) -> i32 {\n    a + b\n}",
+    "let mut vec = Vec::new();\nvec.push(1);\nvec.push(2);\nvec.push(3);",
+    "match option {\n    Some(x) => println!(\"{}\", x),\n    None => println!(\"none\"),\n}",
+    "for i in 0..10 {\n    if i % 2 == 0 {\n        println!(\"{}\", i);\n    }\n}",
+    "struct Point {\n    x: f64,\n    y: f64,\n}",
+    "impl Point {\n    fn new(x: f64, y: f64) -> Self {\n        Point { x, y }\n    }\n}",
+    "use std::collections::HashMap;\nlet mut map = HashMap::new();\nmap.insert(\"key\", \"value\");",
+    "fn factorial(n: u64) -> u64 {\n    if n <= 1 { 1 }\n    else { n * factorial(n - 1) }\n}",
+    "let result = vec.iter()\n    .filter(|&x| *x > 0)\n    .map(|x| x * 2)\n    .collect::<Vec<_>>();",
+    "pub enum Result<T, E> {\n    Ok(T),\n    Err(E),\n}",
+    "fn fibonacci(n: u32) -> u32 {\n    match n {\n        0 => 0,\n        1 => 1,\n        _ => fibonacci(n - 1) + fibonacci(n - 2),\n    }\n}",
+    "trait Display {\n    fn display(&self) -> String;\n}",
+    "let nums = [1, 2, 3, 4, 5];\nlet sum: i32 = nums.iter().sum();",
+    "if let Some(val) = option {\n    println!(\"Got: {}\", val);\n}",
+    "while let Some(item) = iter.next() {\n    process(item);\n}",
+    "let closure = |x: i32| x * 2;\nlet result = closure(5);",
+    "fn bubble_sort(arr: &mut [i32]) {\n    let n = arr.len();\n    for i in 0..n {\n        for j in 0..n - i - 1 {\n            if arr[j] > arr[j + 1] {\n                arr.swap(j, j + 1);\n            }\n        }\n    }\n}",
+    "let mut count = 0;\nloop {\n    if count >= 10 { break; }\n    count += 1;\n}",
+    "vec.iter().enumerate().for_each(|(i, v)| {\n    println!(\"{}: {}\", i, v);\n});"
+  ]
+}

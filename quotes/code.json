@@ -1,0 +1,14 @@
+{
+  "words": [
+    "fn", "let", "const", "if", "else", "match", "return", "struct", "impl", "pub",
+    "use", "mod", "trait", "where", "async", "await", "move", "ref", "mut", "self",
+    "super", "crate", "extern", "type", "enum", "for", "while", "loop", "break", "continue",
+    "String", "Vec", "Option", "Result", "HashMap", "i32", "u64", "f64", "bool", "char",
+    "Some", "None", "Ok", "Err", "true", "false", "println", "format", "unwrap", "expect",
+    "push", "pop", "insert", "remove", "get", "set", "new", "from", "into", "iter",
+    "map", "filter", "collect", "fold", "any", "all", "find", "count", "len", "is_empty",
+    "clone", "copy", "drop", "borrow", "deref", "as_ref", "as_mut", "to_owned", "into_iter", "next",
+    "derive", "debug", "clone", "default", "serialize", "deserialize", "display", "error", "partial_eq", "ord",
+    "mut", "static", "unsafe", "extern", "inline", "test", "cfg", "feature", "target", "warn"
+  ]
+}
