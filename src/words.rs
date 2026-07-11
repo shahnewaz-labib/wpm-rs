@@ -26,6 +26,14 @@ struct SnippetList {
     snippets: Vec<String>,
 }
 
+// ponytail: honor WPM_SEED for reproducible text (demos/tests); entropy otherwise.
+fn rng() -> StdRng {
+    match std::env::var("WPM_SEED").ok().and_then(|s| s.parse::<u64>().ok()) {
+        Some(seed) => StdRng::seed_from_u64(seed),
+        None => StdRng::from_entropy(),
+    }
+}
+
 pub fn load_words_for_language(language: Language) -> Result<Vec<String>> {
     let (path, default) = match language {
         Language::English => ("quotes/english.json", DEFAULT_WORDS),
@@ -153,7 +161,7 @@ pub fn generate_practice_text(
         return generate_text(words, count, false);
     }
 
-    let mut rng = thread_rng();
+    let mut rng = rng();
     let mut result = String::new();
     for i in 0..count {
         let index = rng.gen_range(0..filtered.len());
@@ -170,7 +178,7 @@ pub fn generate_code_text(snippets: &[String], min_words: usize) -> String {
         return String::new();
     }
 
-    let mut rng = thread_rng();
+    let mut rng = rng();
     let mut result = String::new();
     let mut word_count = 0;
 
@@ -187,10 +195,10 @@ pub fn generate_code_text(snippets: &[String], min_words: usize) -> String {
 }
 
 pub fn generate_text(words: &[String], count: usize, punctuation: bool) -> String {
-    let mut rng = thread_rng();
+    let mut rng = rng();
     let mut last_index: Option<usize> = None;
 
-    let pick = |rng: &mut ThreadRng, last_index: &mut Option<usize>| -> usize {
+    let pick = |rng: &mut StdRng, last_index: &mut Option<usize>| -> usize {
         let mut index = rng.gen_range(0..words.len());
         while Some(index) == *last_index && words.len() > 1 {
             index = rng.gen_range(0..words.len());
@@ -266,7 +274,7 @@ pub fn generate_quote_text(quotes: &[String], min_words: usize) -> String {
         return String::new();
     }
 
-    let mut rng = thread_rng();
+    let mut rng = rng();
     let mut result = String::new();
     let mut word_count = 0;
 

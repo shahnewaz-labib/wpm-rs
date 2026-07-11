@@ -293,6 +293,10 @@ impl App {
         }
     }
 
+    pub fn target_text(&self) -> &str {
+        &self.target_text
+    }
+
     pub fn reset(&mut self) {
         self.target_text = Self::generate_target_text(
             &self.words,

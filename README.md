@@ -2,6 +2,8 @@
 
 A terminal-based typing speed test written in Rust with `ratatui`.
 
+![demo](assets/demo.gif)
+
 ## Quick Start
 
 ```bash

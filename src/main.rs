@@ -18,6 +18,11 @@ fn main() -> Result<()> {
     color_eyre::install()?;
     let cli = Cli::parse();
 
+    if cli.print_text {
+        println!("{}", App::new(&cli)?.target_text());
+        return Ok(());
+    }
+
     let terminal = ratatui::init();
     let result = run(terminal, &cli);
     ratatui::restore();

@@ -27,6 +27,10 @@ pub struct Cli {
 
     #[arg(long, help = "Enable stop-on-error mode")]
     pub stop_on_error: bool,
+
+    // ponytail: print generated target text and exit (demos/tests). Hidden.
+    #[arg(long, hide = true)]
+    pub print_text: bool,
 }
 
 impl Cli {
